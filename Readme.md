@@ -1,6 +1,6 @@
 # Multiple Regression Analysis Project
 
-This repository contains the code and analysis for the **Multiple Regression Computing Project** from the course AMS 578: Regression Analysis, Spring 2020. The project focuses on analyzing a dataset to find the best regression model for predicting a dependent variable using a combination of environmental and genetic factors, as outlined in the paper by Caspi et al.
+This repository contains the code and analysis for the **Multiple Regression Computing Project** from the course AMS 578: Regression Analysis, Spring 2020. The project focuses on analyzing a dataset to find the best regression model for predicting a dependent variable using a combination of environmental and genetic factors, as outlined in the paper by [Caspi et al](https://pubmed.ncbi.nlm.nih.gov/19531786/).
 
 ## Project Overview
 

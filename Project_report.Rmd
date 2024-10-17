@@ -1,0 +1,77 @@
+---
+title: "AMS578_Project_Report"
+author: "Yunlong Pan 113061415"
+date: "5/4/2020"
+documentclass: article
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Introduction
+From Caspi's paper,Influence of Life Stress on Depression, we know why stressful experiences lead to depression in some people but not in others. This epidemiological study thus provides evidence of a gene-by-environment interaction, in which an individual’s response to environmental insults is moderated by his or her genetic makeup.
+
+The task is to find the best model using the data from three files. One file contains the patient identifier and the dependent variable value. The second file contains the patient identifier and values of six environment variables called E1 to E6. The third file contains the patient identifier and the twenty independent indicator variables called G1 to G20. 
+
+## Methods
+First, I read data in R and do a basic summary statistics, the mean, median, standard deviation, lower quartile point, upper quartile point, minimum, maximum, and the number of missing values, after binding them together.
+```{r}
+E1415 <- read.csv("/Users/panyl/Desktop/project_578/E/AMS578_E_1415.csv")
+G1415 <- read.csv("/Users/panyl/Desktop/project_578/G/AMS578_G_1415.csv")
+Y1415 <- read.csv("/Users/panyl/Desktop/project_578/Y/AMS578_Y_1415.csv")
+data1415 <- cbind(E1415,G1415,Y1415)
+
+library('MASS')
+data1415_summary<-data.frame(
+  mean = sapply(data1415, mean,na.rm=T),
+  median = sapply(data1415,median,na.rm=T),
+  sd = sapply(data1415,sd,na.rm=T),
+  lower_quartile=sapply(data1415,quantile,na.rm=T)[2,],
+  upper_quartile=sapply(data1415,quantile,na.rm=T)[4,],
+  min = sapply(data1415,min,na.rm=T),
+  max = sapply(data1415, max,na.rm=T),
+  number_missing = sapply(data1415,function(x)sum(is.na(x)))
+)
+data1415_summary
+```
+There are some missing data and my method dealing with them is Mice(Multivariate Imputation via Chained Equations)[1]https://cran.r-project.org/web/packages/mice/index.html.
+```{r}
+library('mice')
+data_complete <- complete(mice(data1415,printFlag = F))
+data_summary<-data.frame(
+  mean = sapply(data_complete,mean),
+  median = sapply(data_complete,median),
+  sd = sapply(data_complete,sd),
+  lower_quartile=sapply(data_complete,quantile)[2,],
+  upper_quartile=sapply(data_complete,quantile)[4,],
+  min = sapply(data_complete,min),
+  max = sapply(data_complete, max),
+  number_missing = sapply(data_complete,function(x)sum(is.na(x)))
+  )
+data_summary
+```
+Second, we calculate the correlations between the independent variables and the dependent. We can get three variables, E1, G1, G16 which have high correlations, also, small p-value with dependent variable, Y. Therefore, I will choose these three variable as important independent variables.
+```{r}
+abs(cor(data_complete)[,27])
+for(i in 1:27){
+  if(abs(cor(data_complete)[i,27])>0.1){
+      print(paste(colnames(data_complete[i])),cor(data_complete)[i,27])
+      }
+}
+```
+Third, we use stepwise regression with BIC to get the coefficients of each important independent variables.
+```{r}
+model1<-lm(Y~(E1+G1+G16)^4,data=data_complete)
+model1_bestBIC<-stepAIC(model1,k=log(nrow(data_complete)))
+summary(model1_bestBIC)
+```
+## Results
+
+## Appendix
+R code for summary statistics
+
+
+
